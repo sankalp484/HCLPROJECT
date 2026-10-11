@@ -1,0 +1,43 @@
+services:
+  api:
+    build: .
+    command: uvicorn src.api:app --host 0.0.0.0 --port 8000 --workers ${API_WORKERS:-2}
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DB_PATH: /app/state/app.db
+      # Ollama on the host, if LLM_PROVIDER=ollama
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - appstate:/app/state          # SQLite store and traces survive restarts
+      - ./judge_data:/app/judge_data:ro  # drop judge CSVs here for scripts/load_data.py
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=5)"]
+      interval: 15s
+      timeout: 6s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+
+  ui:
+    build: .
+    command: streamlit run ui/app.py --server.port 8501 --server.address 0.0.0.0 --browser.gatherUsageStats false
+    ports:
+      - "8501:8501"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      API_URL: http://api:8000
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  appstate:

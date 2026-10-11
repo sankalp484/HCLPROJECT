@@ -1,0 +1,86 @@
+{
+    "run_id": "al-040b15",
+    "request": "What is the cheapest plan that is on time?",
+    "weights": {
+        "cost": 0.8,
+        "carbon": 0.2,
+        "lateness": 1.0
+    },
+    "scenario": {},
+    "data_version": 1,
+    "answer_type": "infeasible",
+    "intent_source": "rules",
+    "steps": [
+        {
+            "agent": "intent",
+            "tool": "parse_intent",
+            "input": {
+                "request": "What is the cheapest plan that is on time?"
+            },
+            "output": {
+                "action": "cheapest_on_time",
+                "source": "rules",
+                "outcome": "run",
+                "intent": {
+                    "action": "cheapest_on_time"
+                }
+            },
+            "ms": 4.3
+        },
+        {
+            "agent": "optimiser",
+            "tool": "solve_allocation",
+            "input": {
+                "weights": {
+                    "cost": 1,
+                    "carbon": 0
+                },
+                "on_time_only": true
+            },
+            "output": {
+                "feasible": false,
+                "cannot_be_on_time": [
+                    "ORD-054",
+                    "ORD-085",
+                    "ORD-099",
+                    "ORD-102",
+                    "ORD-110",
+                    "ORD-111",
+                    "ORD-113",
+                    "ORD-126",
+                    "ORD-149"
+                ]
+            },
+            "ms": 864.5
+        },
+        {
+            "agent": "checker",
+            "tool": "validate_plan",
+            "input": {},
+            "output": {
+                "assignment_ok": true,
+                "eligibility_ok": true,
+                "capacity_ok": true,
+                "no_early_build_ok": true,
+                "delivery_flags_ok": true,
+                "valid": true
+            },
+            "ms": 18.0
+        },
+        {
+            "agent": "writer",
+            "tool": "write_answer",
+            "input": {},
+            "output": {
+                "source": "template",
+                "unsupported_numbers": [],
+                "faithful": true
+            },
+            "ms": 0.1
+        }
+    ],
+    "llm_calls": 0,
+    "tokens": 0,
+    "llm_detail": [],
+    "latency_ms": 895.9
+}

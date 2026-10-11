@@ -12,3 +12,7 @@ venv/
 # Local data and results
 data/*.db
 *.sqlite
+data/*.db-*
+eval/results/
+judge_data/*
+!judge_data/.gitkeep

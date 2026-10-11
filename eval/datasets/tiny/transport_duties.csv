@@ -1,0 +1,7 @@
+plant,destination,transport_cost_per_unit,transit_days,duty_pct,carbon_kg_per_unit
+A,X,0,2,0,0
+B,X,0,2,0,0
+C,X,0,2,0,0
+A,Y,0,20,0,0
+B,Y,0,20,0,0
+C,Y,0,20,0,0

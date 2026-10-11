@@ -1,0 +1,11 @@
+plant,product,week_start,weekly_capacity,unit_cost,energy_kwh_per_unit,carbon_kg_per_kwh,energy_price_per_kwh,capacity_unit,carbon_unit
+A,P1,2026-10-12,100,10,1,1.0,0,units_per_week,kgCO2e_per_kWh
+A,P2,2026-10-12,100,10,1,1.0,0,units_per_week,kgCO2e_per_kWh
+B,P1,2026-10-12,100,12,1,0.5,0,units_per_week,kgCO2e_per_kWh
+C,P1,2026-10-12,50,15,1,0.1,0,units_per_week,kgCO2e_per_kWh
+C,P3,2026-10-12,50,15,1,0.1,0,units_per_week,kgCO2e_per_kWh
+A,P1,2026-10-19,100,10,1,1.0,0,units_per_week,kgCO2e_per_kWh
+A,P2,2026-10-19,100,10,1,1.0,0,units_per_week,kgCO2e_per_kWh
+B,P1,2026-10-19,100,12,1,0.5,0,units_per_week,kgCO2e_per_kWh
+C,P1,2026-10-19,50,15,1,0.1,0,units_per_week,kgCO2e_per_kWh
+C,P3,2026-10-19,50,15,1,0.1,0,units_per_week,kgCO2e_per_kWh

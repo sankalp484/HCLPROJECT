@@ -1,0 +1,4 @@
+order_id,product,qty,destination,due
+M1,P1,60,X,2026-11-20
+M2,P1,60,X,2026-11-27
+M3,P1,60,X,2026-12-04

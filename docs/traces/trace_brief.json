@@ -1,0 +1,100 @@
+{
+    "run_id": "al-af2a01",
+    "request": "Write the brief for the leadership team.",
+    "weights": {
+        "cost": 0.8,
+        "carbon": 0.2,
+        "lateness": 1.0
+    },
+    "scenario": {},
+    "data_version": 1,
+    "answer_type": "brief",
+    "intent_source": "rules",
+    "steps": [
+        {
+            "agent": "intent",
+            "tool": "parse_intent",
+            "input": {
+                "request": "Write the brief for the leadership team."
+            },
+            "output": {
+                "action": "brief",
+                "source": "rules",
+                "outcome": "run",
+                "intent": {
+                    "action": "brief"
+                }
+            },
+            "ms": 2.2
+        },
+        {
+            "agent": "optimiser",
+            "tool": "solve_allocation",
+            "input": {
+                "weights": {
+                    "cost": 0.8,
+                    "carbon": 0.2,
+                    "lateness": 1.0
+                }
+            },
+            "output": {
+                "status": "OPTIMAL"
+            },
+            "ms": 1.2
+        },
+        {
+            "agent": "analyst",
+            "tool": "tradeoff_frontier",
+            "input": {},
+            "output": {
+                "max_cut_pct": 2.24
+            },
+            "ms": 6078.4
+        },
+        {
+            "agent": "scenario",
+            "tool": "compare_plans",
+            "input": {
+                "events": [
+                    "E001",
+                    "E002",
+                    "E003"
+                ]
+            },
+            "output": {
+                "extra_cost": -20428.83,
+                "extra_carbon_t": 15.007
+            },
+            "ms": 12428.0
+        },
+        {
+            "agent": "checker",
+            "tool": "validate_plan",
+            "input": {},
+            "output": {
+                "assignment_ok": true,
+                "eligibility_ok": true,
+                "capacity_ok": true,
+                "no_early_build_ok": true,
+                "delivery_flags_ok": true,
+                "valid": true
+            },
+            "ms": 18.5
+        },
+        {
+            "agent": "writer",
+            "tool": "write_brief",
+            "input": {},
+            "output": {
+                "source": "template",
+                "unsupported_numbers": [],
+                "faithful": true
+            },
+            "ms": 0.2
+        }
+    ],
+    "llm_calls": 0,
+    "tokens": 0,
+    "llm_detail": [],
+    "latency_ms": 18571.0
+}

@@ -13,7 +13,7 @@ langchain-core==1.6.9
 langchain-google-genai==4.4.1
 
 # Solver and analytics
-pulp==4.0.0
+pulp==3.3.2  # 4.x no longer bundles the CBC solver
 pandas==3.0.6
 numpy==2.5.4
 
