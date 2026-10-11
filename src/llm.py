@@ -25,10 +25,20 @@ class LLM:
         self._client = None
         self._lock = threading.Lock()
         self.last_error: str | None = None
+        # circuit breaker: after a failed call, skip the LLM briefly so an outage costs
+        # one slow request, not one per question (answers fall back to templates)
+        self.cooldown_s = float(os.getenv("LLM_COOLDOWN_S", "60"))
+        self._down_until = 0.0
 
     @property
     def enabled(self) -> bool:
-        return not self.mock and self._has_key()
+        return not self.mock and self._has_key() and time.monotonic() >= self._down_until
+
+    def _failed(self, e: Exception) -> None:
+        self.last_error = f"{type(e).__name__}: {str(e)[:200]}"
+        self._down_until = time.monotonic() + self.cooldown_s
+        log.warning("LLM call failed, using templates for %.0fs: %s", self.cooldown_s,
+                    self.last_error)
 
     def _has_key(self) -> bool:
         keys = {"gemini": "GEMINI_API_KEY", "openai": "OPENAI_API_KEY",
@@ -38,7 +48,8 @@ class LLM:
 
     def status(self) -> dict:
         return {"provider": self.provider, "model": self.model,
-                "mode": "live" if self.enabled else "mock",
+                "mode": ("live" if self.enabled else
+                         "cooling_down" if (not self.mock and self._has_key()) else "mock"),
                 "last_error": self.last_error}
 
     def client(self):
@@ -47,12 +58,12 @@ class LLM:
         with self._lock:
             if self._client is not None:
                 return self._client
-            common = {"temperature": 0, "max_retries": 2}
+            common = {"temperature": 0, "max_retries": 1}
             if self.provider == "gemini":
                 from langchain_google_genai import ChatGoogleGenerativeAI
                 self._client = ChatGoogleGenerativeAI(
                     model=self.model, google_api_key=os.environ["GEMINI_API_KEY"],
-                    timeout=30, **common)
+                    timeout=20, **common)
             elif self.provider == "openai":
                 from langchain_openai import ChatOpenAI  # type: ignore[import-not-found]
                 self._client = ChatOpenAI(model=self.model, timeout=30, **common)
@@ -78,8 +89,7 @@ class LLM:
             self.last_error = None
             return out.get("parsed"), _usage(out.get("raw"), start)
         except Exception as e:  # network, quota, bad JSON: fall back, never crash
-            self.last_error = f"{type(e).__name__}: {str(e)[:200]}"
-            log.warning("LLM structured call failed: %s", self.last_error)
+            self._failed(e)
             return None, _usage(None, start, failed=True)
 
     def text(self, messages) -> tuple[str | None, dict]:
@@ -95,8 +105,7 @@ class LLM:
                 for part in msg.content)
             return content.strip(), _usage(msg, start)
         except Exception as e:
-            self.last_error = f"{type(e).__name__}: {str(e)[:200]}"
-            log.warning("LLM text call failed: %s", self.last_error)
+            self._failed(e)
             return None, _usage(None, start, failed=True)
 
 

@@ -79,3 +79,10 @@ def test_invented_numbers_are_caught():
 def test_templates_are_faithful():
     k = {**FACTS["kpis"], "unassigned_orders": 0, "orders_by_plant": {"A": 3, "B": 1}}
     assert check_numbers(summary_allocation(k), {"kpis": k, "share": 75}) == []
+
+
+def test_rounded_numbers_still_pass_faithfulness():
+    facts = {"cost": 9130812.68, "carbon_t": 292.084, "extra": 41044.12, "cut": 2.24}
+    text = "Costs INR 9.13M, 292.1 t of carbon; the deepest cut is 2.2% for INR 41.0K extra."
+    assert check_numbers(text, facts) == []
+    assert check_numbers("Costs INR 9.5M.", facts) == ["9.5M"]

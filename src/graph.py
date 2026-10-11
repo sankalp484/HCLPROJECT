@@ -170,7 +170,10 @@ def allocate_node(state: State) -> dict:
             ids = alloc.loc[alloc["week_start"] == week, "order_id"]
         alloc = alloc[alloc["order_id"].isin(ids)]
         label = f"This week's plan (orders for week {week:%Y-%m-%d})"
-    kpis = plan_kpis(alloc, plan.capacity, [o for o in plan.unassigned])
+    capacity = plan.capacity
+    if state["decision"].intent.this_week_only:  # utilisation vs the weeks shown only
+        capacity = capacity[capacity["week_start"].isin(alloc["week_start"].unique())]
+    kpis = plan_kpis(alloc, capacity, [o for o in plan.unassigned])
     answer = "infeasible" if plan.unassigned else "allocation"
     facts = {"kpis": kpis, "status": plan.status, "late": alloc.loc[~alloc["on_time"],
              ["order_id", "plant", "days_late"]].to_dict("records")}

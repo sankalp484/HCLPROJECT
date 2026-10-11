@@ -85,3 +85,15 @@ def test_manipulated_llm_intent_still_guarded():
               plants=["A", "B", "C"], order_ids=["ORD-004"], event_ids=[], orders=orders,
               eligible=eligible, planning_start=pd.Timestamp("2026-10-12"))
     assert d.outcome == "refused"
+
+
+def test_circuit_breaker_skips_llm_after_failure(monkeypatch):
+    from src.llm import LLM
+    monkeypatch.setenv("MOCK_LLM", "false")
+    monkeypatch.setenv("GEMINI_API_KEY", "x")
+    llm = LLM()
+    assert llm.enabled
+    llm._failed(RuntimeError("503 UNAVAILABLE"))
+    assert not llm.enabled and llm.status()["mode"] == "cooling_down"
+    llm._down_until = 0
+    assert llm.enabled
