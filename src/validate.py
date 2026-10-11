@@ -22,7 +22,7 @@ def validate_all(orders, plants, transport, events) -> dict:
     results["capacity_positive"] = bool((plants["weekly_capacity"] > 0).all())
 
     # 4. Due dates are after planning start
-    results["due_dates_valid"] = bool((orders["due"] > PLANNING_START).all())
+    results["due_dates_valid"] = bool((orders["due_date"] > PLANNING_START).all())  # ← FIXED
 
     # 5. Carbon intensity is non-negative
     results["carbon_valid"] = bool((plants["carbon_kg_per_kwh"] >= 0).all())

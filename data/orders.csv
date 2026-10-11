@@ -1,4 +1,4 @@
-order_id,product,qty,destination,due,production_week
+order_id,product,qty,destination,due_date,production_week
 ORD-001,P3,105,Milan,2026-11-07,2026-10-12
 ORD-002,P3,145,Toronto,2026-11-21,2026-10-12
 ORD-003,P1,20,Dubai,2026-11-16,2026-10-12
