@@ -1,0 +1,26 @@
+# Runtime: Python 3.12
+
+# API
+fastapi==0.143.0
+uvicorn[standard]==0.54.0
+pydantic==2.14.0
+pydantic-settings==2.15.0
+python-multipart==0.0.32
+
+# Orchestration and LLM (Gemini)
+langgraph==1.2.14
+langchain-core==1.6.9
+langchain-google-genai==4.4.1
+
+# Solver and analytics
+pulp==4.0.0
+pandas==3.0.6
+numpy==2.5.4
+
+# UI and chart
+streamlit==1.65.0
+plotly==7.1.0
+requests==2.34.2
+
+# Config
+python-dotenv==1.2.4
