@@ -104,7 +104,8 @@ def implied_carbon_price(engine: Engine, weights: dict) -> float | None:
 
 
 def compare_plans(base: Plan, new: Plan) -> dict:
-    """What changed between two plans: totals and every order that moved."""
+    """What changed between two plans. Deltas are like-for-like (orders placed in both);
+    orders the new plan cannot place are listed separately with the cost excluded."""
     kb, kn = base.kpis, new.kpis
     a = base.allocation.set_index("order_id")
     b = new.allocation.set_index("order_id")
@@ -122,14 +123,22 @@ def compare_plans(base: Plan, new: Plan) -> dict:
             "now_late": bool(not b.at[oid, "on_time"] and a.at[oid, "on_time"]),
         })
     newly_unassigned = sorted(set(new.unassigned) - set(base.unassigned))
+
+    # Like-for-like: compare only orders placed in BOTH plans. Otherwise a plan that
+    # drops an order looks cheaper and greener, which is the opposite of the truth.
+    ca, cb = a.loc[common], b.loc[common]
+    dropped = a.loc[a.index.difference(b.index)]  # placed before, not placed now
+    extra_cost = float(cb["cost"].sum() - ca["cost"].sum())
     return {
-        "extra_cost": round(kn["total_cost"] - kb["total_cost"], 2),
-        "extra_cost_pct": round(100 * (kn["total_cost"] / kb["total_cost"] - 1), 2)
-        if kb["total_cost"] else None,
-        "extra_carbon_t": round(kn["total_carbon_t"] - kb["total_carbon_t"], 3),
-        "extra_late_orders": kn["late_orders"] - kb["late_orders"],
+        "extra_cost": round(extra_cost, 2),
+        "extra_cost_pct": round(100 * extra_cost / float(ca["cost"].sum()), 2)
+        if len(ca) and ca["cost"].sum() else None,
+        "extra_carbon_t": round(float(cb["carbon_kg"].sum() - ca["carbon_kg"].sum()) / 1000, 3),
+        "extra_late_orders": int((~cb["on_time"]).sum() - (~ca["on_time"]).sum()),
         "newly_late": sorted(set(b.index[~b["on_time"]]) - set(a.index[~a["on_time"]])),
         "newly_unassigned": newly_unassigned,
+        "unplaced_cost_excluded": round(float(dropped["cost"].sum()), 2),
+        "unplaced_carbon_t_excluded": round(float(dropped["carbon_kg"].sum()) / 1000, 3),
         "orders_moved": len(moved),
         "plan_stability_pct": round(100 * (1 - len(moved) / max(len(common), 1)), 1),
         "moved": moved,

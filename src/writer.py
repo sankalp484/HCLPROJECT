@@ -54,13 +54,17 @@ def summary_allocation(k: dict, label: str = "Plan") -> str:
 
 
 def summary_scenario(title: str, c: dict) -> str:
-    return (f"{title}: cost {signed_money(c['extra_cost'])} ({c['extra_cost_pct']:+.2f}%), "
-            f"carbon {c['extra_carbon_t']:+,.1f} t, late orders {c['extra_late_orders']:+d}; "
-            f"{c['orders_moved']} orders moved ({c['plan_stability_pct']:.1f}% of the plan "
-            "unchanged)." + (f" Newly late: {', '.join(c['newly_late'])}." if c["newly_late"]
-                             else "")
-            + (f" Cannot be placed: {', '.join(c['newly_unassigned'])}."
-               if c["newly_unassigned"] else ""))
+    s = (f"{title}: cost {signed_money(c['extra_cost'])} ({c['extra_cost_pct']:+.2f}%), "
+         f"carbon {c['extra_carbon_t']:+,.1f} t, late orders {c['extra_late_orders']:+d}; "
+         f"{c['orders_moved']} orders moved ({c['plan_stability_pct']:.1f}% of the plan "
+         "unchanged).")
+    if c["newly_late"]:
+        s += f" Newly late: {', '.join(c['newly_late'])}."
+    if c["newly_unassigned"]:
+        s += (f" Cannot be placed: {', '.join(c['newly_unassigned'])} (no capacity left "
+              "in any plant in the planning horizon); changes above compare only orders "
+              "placed in both plans.")
+    return s
 
 
 def summary_tradeoff(t: dict) -> str:
