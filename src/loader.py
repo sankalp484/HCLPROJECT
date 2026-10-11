@@ -1,14 +1,34 @@
 import pandas as pd
+from pathlib import Path
 
-def load_orders(path="data/orders.csv") -> pd.DataFrame:
-    return pd.read_csv(path, parse_dates=["due_date"])
+DATA_DIR = Path("data")
 
-def load_plants(path="data/plants.csv") -> pd.DataFrame:
-    return pd.read_csv(path)
-
-def load_transport(path="data/transport_duties.csv") -> pd.DataFrame:
-    return pd.read_csv(path)
-
-def load_capacity_events(path="data/capacity_events.csv") -> pd.DataFrame:
-    df = pd.read_csv(path, parse_dates=["from_date", "to_date"])
+def load_orders() -> pd.DataFrame:
+    df = pd.read_csv(DATA_DIR / "orders.csv", parse_dates=["due", "production_week"])
     return df
+
+def load_plants() -> pd.DataFrame:
+    df = pd.read_csv(DATA_DIR / "plants.csv", parse_dates=["week_start"])
+    return df
+
+def load_transport() -> pd.DataFrame:
+    df = pd.read_csv(DATA_DIR / "transport_duties.csv")
+    return df
+
+def load_capacity_events() -> pd.DataFrame:
+    df = pd.read_csv(DATA_DIR / "capacity_events.csv",
+                      parse_dates=["from_date", "to_date"])
+    return df
+
+def load_all() -> dict:
+    return {
+        "orders": load_orders(),
+        "plants": load_plants(),
+        "transport": load_transport(),
+        "events": load_capacity_events(),
+    }
+
+if __name__ == "__main__":
+    data = load_all()
+    for name, df in data.items():
+        print(f"{name}: {len(df)} rows, {len(df.columns)} cols")
