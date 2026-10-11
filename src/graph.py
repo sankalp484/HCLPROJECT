@@ -368,7 +368,9 @@ def write_node(state: State) -> dict:
     out = dict(state["out"])
     facts = state.get("facts") or {}
     action = state["decision"].intent.action
-    kind = NARRATED.get(answer) or ("default" if action == "explain_order" else None)
+    # explain_order keeps its deterministic template: it is already complete and exact,
+    # and an LLM call would add latency and a failure point for no gain
+    kind = NARRATED.get(answer) if action != "explain_order" else None
     llm_usage, step_out = [], {"source": "template"}
     if kind and facts:
         n = W.narrate(kind, state["request"], facts, out["summary"])
@@ -388,7 +390,8 @@ def recommendations(state: State, out: dict) -> list[dict]:
     k = out.get("kpis") or {}
     v = out.get("validator") or {}
     recs = []
-    if answer in ("clarification_needed", "refused"):
+    explaining = state["decision"].intent.action == "explain_order"
+    if answer in ("clarification_needed", "refused") or explaining:
         return recs
     if answer in ("allocation", "brief") and k:
         recs.append(W.rec(

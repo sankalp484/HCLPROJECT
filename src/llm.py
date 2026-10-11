@@ -63,7 +63,7 @@ class LLM:
                 from langchain_google_genai import ChatGoogleGenerativeAI
                 self._client = ChatGoogleGenerativeAI(
                     model=self.model, google_api_key=os.environ["GEMINI_API_KEY"],
-                    timeout=20, **common)
+                    timeout=12, **common)
             elif self.provider == "openai":
                 from langchain_openai import ChatOpenAI  # type: ignore[import-not-found]
                 self._client = ChatOpenAI(model=self.model, timeout=30, **common)

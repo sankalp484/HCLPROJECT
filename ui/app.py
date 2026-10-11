@@ -114,6 +114,8 @@ def render(res: dict):
     st.markdown(res.get("narrative") or res["summary"])
 
     k = res.get("kpis") or {}
+    if k and res.get("explanation"):
+        st.caption("Totals below are for the whole plan, not just this order.")
     if k:
         c = st.columns(5)
         c[0].metric("Total cost", money(k["total_cost"]))
