@@ -1,0 +1,4 @@
+event_id,plant,from_date,to_date,capacity_loss_pct,scenario_id,description
+E001,B,2026-11-02,2026-11-15,0.3,S1_PLANT_B_LOSS_30,Plant B loses 30% of weekly capacity for two weeks (late data-drop scenario)
+E002,C,2026-11-23,2026-11-29,0.85,S2_PLANT_C_SEVERE_LOSS,Plant C loses 85% of weekly capacity for one week; only Plant C makes P5
+E003,A,2026-10-19,2026-10-25,0.1,S3_PLANT_A_MINOR_LOSS,Plant A loses 10% of weekly capacity for one week (mild regression-test scenario)
